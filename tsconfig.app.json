@@ -3,6 +3,9 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "ES2020",
     "useDefineForClassFields": true,
+    "types": [
+      "node"
+    ],
     "lib": [
       "ES2020",
       "DOM",
@@ -28,6 +31,12 @@
       "components/*": [
         "src/components/*"
       ],
+      "config/*": [
+        "src/config/*"
+      ],
+      "pages/*": [
+        "src/pages/*"
+      ]
     },
     /* Linting */
     "strict": true,
