@@ -1,4 +1,6 @@
 
+import axios from 'axios'
+
 
 declare module '*.png' {
     export default string;

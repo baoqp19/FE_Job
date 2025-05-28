@@ -1,5 +1,5 @@
 
-import axios from '@/config/axios-customize';
+import axios from '../config/axios-customize';
 import type { IAccount, IBackendRes, ICompany, IGetAccount, IJob, IModelPaginate, IPermission, IResume, IRole, ISkill, IUser } from '@/types/backend';
 /**
  * Module Auth 
@@ -12,7 +12,7 @@ export const callRegister = (name: string, email: string, password: string, age:
 
 
 export const callLogin = (username: string, password: string) => {
-    return axios.post<IBackendRes<IGetAccount>>("/api/v1/auth/login", { username, password })
+    return axios.post<IBackendRes<IAccount>>("/api/v1/auth/login", { username, password })
 }
 
 export const callFetchAccount = () => {
@@ -27,21 +27,22 @@ export const callLogout = () => {
     return axios.post<IBackendRes<string>>('/api/v1/auth/logout')
 }
 
-
+/**
+ * Upload single file
+ */
 export const callUploadSingleFile = (file: any, folderType: string) => {
     const bodyFormData = new FormData();
-    bodyFormData.append('file', file)
+    bodyFormData.append('file', file);
     bodyFormData.append('folder', folderType);
 
-
     return axios<IBackendRes<{ fileName: string }>>({
-        method: "post",
-        ulr: "/api/v1/files",
+        method: 'post',
+        url: '/api/v1/files',
         data: bodyFormData,
-        Headers: {
-            "Content-Type": "multipart/form-data"
-        }
-    })
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
 }
 
 

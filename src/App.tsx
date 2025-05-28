@@ -1,10 +1,25 @@
+import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import LoginPage from "./page/auth/login"
+import RegisterPage from "./page/auth/register"
 
-function App() {
+export default function App() {
+
+  const router = createBrowserRouter([
+    {
+      path: "/login",
+      element: <LoginPage />
+    },
+
+    {
+      path: "/register",
+      element: <RegisterPage />
+    }
+  ])
+
   return (
     <>
-      <div>Xin chao</div>
+      <RouterProvider router={router} />
     </>
   )
 }
 
-export default App

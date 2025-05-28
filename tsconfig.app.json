@@ -25,18 +25,18 @@
       "@/*": [
         "./src/*"
       ],
-      "styles/*": [
-        "src/styles/*"
-      ],
-      "components/*": [
-        "src/components/*"
-      ],
-      "config/*": [
-        "src/config/*"
-      ],
-      "pages/*": [
-        "src/pages/*"
-      ]
+      // "styles/*": [
+      //   "src/styles/*"
+      // ],
+      // "components/*": [
+      //   "src/components/*"
+      // ],
+      // "config/*": [
+      //   "src/config/*"
+      // ],
+      // "pages/*": [
+      //   "src/pages/*"
+      // ]
     },
     /* Linting */
     "strict": true,

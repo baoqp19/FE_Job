@@ -1,10 +1,33 @@
-import { Button, Divider, Form, Input, Select, type FormProps } from "antd";
+import { Button, Divider, Form, Input, message, notification, Select, type FormProps } from "antd";
 import { Option } from "antd/es/mentions";
 import styles from "./../../styles/auth.module.scss";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { callRegister } from "../../config/api";
 const RegisterPage = () => {
 
-    const onFinish: FormProps['onFinish'] = (values) => {
-        console.log('Success:', values);
+    const navigate = useNavigate();
+    const [isSubmit, setIsSubmit] = useState(false);
+
+    const onFinish: FormProps['onFinish'] = async (values: any) => {
+
+        const { name, email, password, age, gender, address } = values;
+        setIsSubmit(true)
+        const res = await callRegister(name, email, password as string, +age, gender, address);
+        setIsSubmit(false)
+
+        if (res.data?.id) {
+            message.success("Đăng kí tài khoản thành công")
+            navigate("/login");
+        } else {
+            notification.error({
+                message: "có lỗi xẩy ra",
+                description:
+                    res.message && Array.isArray(res.message) ? res.message[0] : res.message,
+                duration: 5
+            })
+        }
+
     };
 
 
@@ -87,18 +110,17 @@ const RegisterPage = () => {
                             >
                                 <Input />
                             </Form.Item>
-
                             < Form.Item
                             // wrapperCol={{ offset: 6, span: 16 }}
                             >
-                                <Button type="primary" htmlType="submit" >
+                                <Button type="primary" htmlType="submit" loading={isSubmit} >
                                     Đăng ký
                                 </Button>
                             </Form.Item>
                             <Divider> Or </Divider>
                             <p className="text text-normal" > Đã có tài khoản ?
                                 <span>
-                                    {/* <Link to='/login' > Đăng Nhập </Link> */}
+                                    <Link to='/login' > Đăng Nhập </Link>
                                 </span>
                             </p>
                         </Form>

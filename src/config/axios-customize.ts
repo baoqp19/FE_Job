@@ -1,4 +1,15 @@
+import { setRefreshTokenAction } from "../redux/slice/accountSlice";
+import { store } from "../redux/store";
+import type { IBackendRes } from "@/types/backend";
+import { notification } from "antd";
+import { Mutex } from "async-mutex";
 import axiosClient from "axios";
+
+interface AccessTokenResponse {
+    access_token: string;
+}
+
+
 
 
 /**
@@ -10,15 +21,16 @@ const instance = axiosClient.create({
     withCredentials: true  // cho phép gửi và nhận cookie
 });
 
+const mutex = new Mutex();
 const NO_RETRY_HEADER = 'x-no-retry';
 
-
-// lấy ra refresh token 
-const handleRefreshToken = async () => {
-    const res = await instance.get('/api/v1/auth/refresh');
-    if (res && res.data) return res.data.access_token;
-    else return null;
-}
+const handleRefreshToken = async (): Promise<string | null> => {
+    return await mutex.runExclusive(async () => {
+        const res = await instance.get<IBackendRes<AccessTokenResponse>>('/api/v1/auth/refresh');
+        if (res && res.data) return res.data.access_token;
+        else return null;
+    });
+};
 
 /* intercepters: là một cơ chế cho phép bạn can thiệp vào quá trình xử lý request hoặc response
    trước khi chúng được xử lý bởi then hoặc catch.
@@ -30,30 +42,35 @@ const handleRefreshToken = async () => {
     Giảm lặp code: Không cần thêm headers này vào mỗi request riêng lẻ.
 */
 
+
+// trước khi gửi yêu cầu 
 instance.interceptors.request.use(function (config) {
-    // windown: có ở trong môi trường browers
     if (typeof window !== "undefined" && window && window.localStorage && window.localStorage.getItem('access_token')) {
         config.headers.Authorization = 'Bearer ' + window.localStorage.getItem('access_token');
     }
-    // nếu chưa có thì thêm vào headers
-
     if (!config.headers.Accept && config.headers["Content-Type"]) {
-        config.headers.Accept = "application/json";        // yêu cầu server trả về JSON 
-        config.headers["Content-Type"] = "application/json; charset=utf-8"; // định dạng JSON và utf-8
+        config.headers.Accept = "application/json";
+        config.headers["Content-Type"] = "application/json; charset=utf-8";
     }
     return config;
 });
 
 
+
+/**
+ * Handle all responses. It is possible to add handlers
+ * for requests, but it is omitted here for brevity.
+ */
 instance.interceptors.response.use(
-    (res) => res.data,  
+    (res) => res.data,
     async (error) => {
         if (error.config && error.response
             && +error.response.status === 401
+            && error.config.url !== '/api/v1/auth/login'
             && !error.config.headers[NO_RETRY_HEADER]
         ) {
             const access_token = await handleRefreshToken();
-            error.config.headers[NO_RETRY_HEADER] = 'true'  // Đánh dấu request đã được thử refresh để tránh lặp vô hạn.
+            error.config.headers[NO_RETRY_HEADER] = 'true'
             if (access_token) {
                 error.config.headers['Authorization'] = `Bearer ${access_token}`;
                 localStorage.setItem('access_token', access_token)
@@ -65,15 +82,33 @@ instance.interceptors.response.use(
             error.config && error.response
             && +error.response.status === 400
             && error.config.url === '/api/v1/auth/refresh'
+            && location.pathname.startsWith("/admin")
         ) {
-            localStorage.removeItem('access_token')
-            alert(`You don't have permission to visit this page. OK ?`);
-            window.location.href = "/";
+            const message = error?.response?.data?.error ?? "Có lỗi xảy ra, vui lòng login.";
+            //dispatch redux action
+            store.dispatch(setRefreshTokenAction({ status: true, message }));
         }
 
-        return error?.response?.data ?? Promise.reject(error);  // nếu có lỗi từ server thì trả k thì trả về message
+        if (+error.response.status === 403) {
+            notification.error({
+                message: error?.response?.data?.message ?? "",
+                description: error?.response?.data?.error ?? ""
+            })
+        }
+
+        return error?.response?.data ?? Promise.reject(error);
     }
 );
 
+/**
+ * Replaces main `axios` instance with the custom-one.
+ *
+ * @param cfg - Axios configuration object.
+ * @returns A promise object of a response of the HTTP request with the 'data' object already
+ * destructured.
+ */
+// const axios = <T>(cfg: AxiosRequestConfig) => instance.request<any, T>(cfg);
+
+// export default axios;
 
 export default instance;

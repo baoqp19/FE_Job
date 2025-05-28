@@ -1,17 +1,15 @@
+import { callFetchAccount } from "../../config/api";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 
 
-
-// viet 3 trạng thái cho extraReducer 
+// First, create the thunk
 export const fetchAccount = createAsyncThunk(
     'account/fetchAccount',
     async () => {
-        const response = await axios.get('/api/v1/auth/account')
-        return response.data
+        const response = await callFetchAccount();
+        return response.data;
     }
 )
-
 
 interface IState {
     isAuthenticated: boolean;
@@ -37,38 +35,60 @@ interface IState {
     activeMenu: string;
 }
 
-
-const initialState = {
+const initialState: IState = {
     isAuthenticated: false,
     isLoading: true,
+    isRefreshToken: false,
+    errorRefreshToken: "",
     user: {
-        userId: "",
+        id: "",
         email: "",
-        phone: "",
-        _id: "",
-        role: "",
+        name: "",
+        role: {
+            id: "",
+            name: "",
+            permissions: [],
+        },
     },
-    activeMenu: 'home'
 
-}
+    activeMenu: 'home'
+};
+
 
 export const accountSlice = createSlice({
     name: "account",
     initialState,
     extraReducers: (builder) => {
+
+        builder.addCase(fetchAccount.pending, (state, action) => {
+            if (action.payload) {
+                state.isAuthenticated = false;
+                state.isLoading = true;
+            }
+        })
+
         builder.addCase(fetchAccount.fulfilled, (state, action) => {
             if (action.payload) {
+
                 state.isAuthenticated = true,
                     state.isLoading = false,
+                    state.user.id = action?.payload?.user?.id
+                state.user.email = action.payload.user.email
+                state.user.name = action.payload.user.name
+                state.user.role = action.payload.user.role
+                if (!action?.payload?.user?.role) state.user.role = {};
+                state.user.role.permissions = action?.payload?.user?.role?.permissions ?? [];
+            }
+        })
 
-                    state.user.email = action.payload.email
-                state.user.phone = action.payload.phone
-                state.user._id = action.payload._id
-                state.user.role = action.payload.role
-
+        builder.addCase(fetchAccount.rejected, (state, action) => {
+            if (action.payload) {
+                state.isAuthenticated = false;
+                state.isLoading = false;
             }
         })
     },
+
     reducers: {
         setActiveMenu: (state, action) => {
             state.activeMenu = action.payload;
@@ -77,27 +97,40 @@ export const accountSlice = createSlice({
         setUserLoginInfo: (state, action) => {
             state.isAuthenticated = true,
                 state.isLoading = false;
-            state.user = {
-                ...state.user = action.payload
-            }
+            state.user.id = action?.payload?.id;
+            state.user.email = action.payload.email;
+            state.user.name = action.payload.name;
+            state.user.role = action?.payload?.role;
+
+            if (!action?.payload?.user?.role) state.user.role = {};
+            state.user.role.permissions = action?.payload?.role?.permissions ?? [];
         },
 
         setLogoutAction: (state, action) => {
-            localStorage.removeItem("access_token");
+            localStorage.removeItem('access_token');
             state.isAuthenticated = false;
             state.user = {
-                userId: "",
+                id: "",
                 email: "",
-                phone: "",
-                _id: "",
-                role: "",
+                name: "",
+                role: {
+                    id: "",
+                    name: "",
+                    permissions: [],
+                },
             }
+        },
+
+        setRefreshTokenAction: (state, action) => {
+            state.isRefreshToken = action.payload?.status ?? false;
+            state.errorRefreshToken = action.payload?.message ?? "";
         }
+
     },
 });
 
 export const {
-    setActiveMenu, setUserLoginInfo, setLogoutAction
+    setActiveMenu, setUserLoginInfo, setLogoutAction, setRefreshTokenAction
 } = accountSlice.actions;
 
 export default accountSlice.reducer   // lấy mỗi reducer 
