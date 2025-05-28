@@ -17,9 +17,16 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "styles/*": [
+        "src/styles/*"
+      ],
+      "components/*": [
+        "src/components/*"
       ],
     },
     /* Linting */
