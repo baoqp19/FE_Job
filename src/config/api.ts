@@ -1,6 +1,6 @@
 
 import axios from '../config/axios-customize';
-import type { IAccount, IBackendRes, ICompany, IGetAccount, IJob, IModelPaginate, IPermission, IResume, IRole, ISkill, IUser } from '@/types/backend';
+import type { IAccount, IBackendRes, ICompany, IGetAccount, IJob, IModelPaginate, IPermission, IResume, IRole, ISkill, IUser } from 'src/types/backend';
 /**
  * Module Auth 
  *
