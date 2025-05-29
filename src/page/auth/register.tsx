@@ -4,6 +4,7 @@ import styles from "./../../styles/auth.module.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { callRegister } from "../../config/api";
+import type { IUser } from "src/types/backend";
 const RegisterPage = () => {
 
     const navigate = useNavigate();
@@ -40,7 +41,7 @@ const RegisterPage = () => {
                             Đăng kí tài khoản
                             <Divider />
                         </h2>
-                        < Form
+                        < Form<IUser>
                             name="basic"
                             // style={{ maxWidth: 600, margin: '0 auto' }}
                             onFinish={onFinish}

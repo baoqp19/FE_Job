@@ -1,16 +1,13 @@
 import { setRefreshTokenAction } from "../redux/slice/accountSlice";
 import { store } from "../redux/store";
-import type { IBackendRes } from "@/types/backend";
 import { notification } from "antd";
 import { Mutex } from "async-mutex";
 import axiosClient from "axios";
+import type { IBackendRes } from "src/types/backend";
 
 interface AccessTokenResponse {
     access_token: string;
 }
-
-
-
 
 /**
  * Creates an initial 'axios' instance with custom settings.

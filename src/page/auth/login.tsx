@@ -10,7 +10,7 @@ const LoginPage = () => {
 
 	const [isSubmit, setIsSubmit] = useState(false)
 	const dispatch = useAppDispatch()
-	
+
 	const isAuthenticated = useAppSelector((state) => state.account.isAuthenticated);
 	const location = useLocation();
 
@@ -38,9 +38,6 @@ const LoginPage = () => {
 				duration: 5
 			})
 		}
-
-
-
 	};
 
 	return (
