@@ -6,6 +6,7 @@ import Footer from "./components/client/footer.client";
 import Header from "./components/client/header.client";
 import styles from './styles/app.module.scss';
 import NotFound from "./components/share/not.found";
+import LayoutApp from "./components/share/layout.app";
 
 
 
@@ -39,9 +40,10 @@ const LayoutClient = () => {
 export default function App() {
 
   const router = createBrowserRouter([
+
     {
       path: "/",
-      element: <LayoutClient />,
+      element: <LayoutApp> <LayoutClient /></LayoutApp>,
       errorElement: <NotFound />,
       children: [
         {
@@ -60,6 +62,7 @@ export default function App() {
       path: "/register",
       element: <RegisterPage />
     }
+
   ])
 
   return (
