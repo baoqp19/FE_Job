@@ -51,11 +51,10 @@ export default function App() {
     if (
       window.location.pathname === '/login'
       || window.location.pathname === '/register'
-    )
+    ) // khi người dùng đang ở login và register thì không cần gọi để lấy acccount 
       return;
 
     dispatch(fetchAccount())
-
   }, [])
 
   const router = createBrowserRouter([

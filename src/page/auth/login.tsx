@@ -1,6 +1,6 @@
 import { Button, Divider, Form, Input, message, notification, type FormProps } from "antd";
 import styles from "./../../styles/auth.module.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { callLogin } from "../../config/api";
 import { setUserLoginInfo } from "../../redux/slice/accountSlice";
@@ -16,11 +16,11 @@ const LoginPage = () => {
 	let location = useLocation();
 
 
-	// useEffect(() => {
-	//     if(isAuthenticated){
-	//         window.location.href = '/'
-	//     }
-	// }, [isAuthenticated])
+	useEffect(() => {
+		if (isAuthenticated) {
+			window.location.href = '/'
+		}
+	}, [isAuthenticated])
 
 	let params = new URLSearchParams(location.search);
 	const callback = params?.get("callback");  // get('callback') = Mycallback
