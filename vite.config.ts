@@ -12,6 +12,7 @@ export default defineConfig({
       styles: `${path.resolve(__dirname, "./src/styles/")}`,
       config: `${path.resolve(__dirname, "./src/config/")}`,
       pages: `${path.resolve(__dirname, "./src/pages/")}`,
+      types: `${path.resolve(__dirname, "./src/types/")}`,
     },
   },
 })

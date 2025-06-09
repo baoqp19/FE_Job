@@ -11,6 +11,7 @@ export const fetchAccount = createAsyncThunk(
     }
 )
 
+
 interface IState {
     isAuthenticated: boolean;
     isLoading: boolean;
@@ -55,48 +56,18 @@ const initialState: IState = {
 };
 
 
-export const accountSlice = createSlice({
-    name: "account",
+export const accountSlide = createSlice({
+    name: 'account',
     initialState,
-    extraReducers: (builder) => {
-
-        builder.addCase(fetchAccount.pending, (state, action) => {
-            if (action.payload) {
-                state.isAuthenticated = false;
-                state.isLoading = true;
-            }
-        })
-
-        builder.addCase(fetchAccount.fulfilled, (state, action) => {
-            if (action.payload) {
-
-                state.isAuthenticated = true,
-                    state.isLoading = false,
-                    state.user.id = action?.payload?.user?.id
-                state.user.email = action.payload.user.email
-                state.user.name = action.payload.user.name
-                state.user.role = action.payload.user.role
-                if (!action?.payload?.user?.role) state.user.role = {};
-                state.user.role.permissions = action?.payload?.user?.role?.permissions ?? [];
-            }
-        })
-
-        builder.addCase(fetchAccount.rejected, (state, action) => {
-            if (action.payload) {
-                state.isAuthenticated = false;
-                state.isLoading = false;
-            }
-        })
-    },
-
+    // The `reducers` field lets us define reducers and generate associated actions
     reducers: {
+        // Use the PayloadAction type to declare the contents of `action.payload`
         setActiveMenu: (state, action) => {
             state.activeMenu = action.payload;
         },
-
         setUserLoginInfo: (state, action) => {
-            state.isAuthenticated = true,
-                state.isLoading = false;
+            state.isAuthenticated = true;
+            state.isLoading = false;
             state.user.id = action?.payload?.id;
             state.user.email = action.payload.email;
             state.user.name = action.payload.name;
@@ -105,6 +76,8 @@ export const accountSlice = createSlice({
             if (!action?.payload?.user?.role) state.user.role = {};
             state.user.role.permissions = action?.payload?.role?.permissions ?? [];
         },
+
+
 
         setLogoutAction: (state, action) => {
             localStorage.removeItem('access_token');
@@ -120,17 +93,47 @@ export const accountSlice = createSlice({
                 },
             }
         },
-
         setRefreshTokenAction: (state, action) => {
             state.isRefreshToken = action.payload?.status ?? false;
             state.errorRefreshToken = action.payload?.message ?? "";
         }
 
     },
+    extraReducers: (builder) => {
+        // Add reducers for additional action types here, and handle loading state as needed
+        builder.addCase(fetchAccount.pending, (state, action) => {
+            if (action.payload) {
+                state.isAuthenticated = false;
+                state.isLoading = true;
+            }
+        })
+
+        builder.addCase(fetchAccount.fulfilled, (state, action) => {
+            if (action.payload) {
+                state.isAuthenticated = true;
+                state.isLoading = false;
+                state.user.id = action?.payload?.user?.id;
+                state.user.email = action.payload.user?.email;
+                state.user.name = action.payload.user?.name;
+                state.user.role = action?.payload?.user?.role;
+                if (!action?.payload?.user?.role) state.user.role = {};
+                state.user.role.permissions = action?.payload?.user?.role?.permissions ?? [];
+            }
+        })
+
+        builder.addCase(fetchAccount.rejected, (state, action) => {
+            if (action.payload) {
+                state.isAuthenticated = false;
+                state.isLoading = false;
+            }
+        })
+
+    },
+
 });
 
 export const {
     setActiveMenu, setUserLoginInfo, setLogoutAction, setRefreshTokenAction
-} = accountSlice.actions;
+} = accountSlide.actions;
 
-export default accountSlice.reducer   // lấy mỗi reducer 
+export default accountSlide.reducer;

@@ -70,8 +70,6 @@ export const callFetchCompanyById = (id: string) => {
     return axios.get<IBackendRes<ICompany>>(`/api/v1/companies/${id}`);
 }
 
-
-
 export const callCreateSkill = (name: string) => {
     return axios.post<IBackendRes<ISkill>>('/api/v1/skills', { name })
 }

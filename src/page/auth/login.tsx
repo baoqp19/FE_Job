@@ -1,6 +1,6 @@
 import { Button, Divider, Form, Input, message, notification, type FormProps } from "antd";
 import styles from "./../../styles/auth.module.scss";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { callLogin } from "../../config/api";
 import { setUserLoginInfo } from "../../redux/slice/accountSlice";
@@ -12,22 +12,25 @@ const LoginPage = () => {
 	const dispatch = useAppDispatch()
 
 	const isAuthenticated = useAppSelector((state) => state.account.isAuthenticated);
+
 	let location = useLocation();
 
 
-	useEffect(() => {
-		if (isAuthenticated) {
-			window.location.href = "/"
-		}
-	}, [])
+	// useEffect(() => {
+	//     if(isAuthenticated){
+	//         window.location.href = '/'
+	//     }
+	// }, [isAuthenticated])
 
 	let params = new URLSearchParams(location.search);
 	const callback = params?.get("callback");  // get('callback') = Mycallback
 
 
 	const onFinish: FormProps['onFinish'] = async (values: any) => {
+
 		const { username, password } = values;
 		setIsSubmit(true)
+
 		const res = await callLogin(username, password)
 		setIsSubmit(false)
 
