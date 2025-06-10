@@ -1,9 +1,10 @@
 import { callFetchResumeByUser } from "@/config/api";
 import type { IResume } from "@/types/backend";
-import type { TabsProps } from "antd";
+import { Modal, Table, Tabs, type TabsProps } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
+import { isMobile } from "react-device-detect";
 
 interface IProps {
     open: boolean;
@@ -16,15 +17,18 @@ const UserResume = (props: any) => {
     const [listCV, setListCV] = useState<IResume[]>([]);
     const [isFetching, setIsFetching] = useState<boolean>(false);
 
-    useEffect(() => {
-        const init = async () => {
-            setIsFetching(true);
-            const res = await callFetchResumeByUser();
-            if (res && res.data) {
-                setListCV(res.data.result as IResume[])
-            }
-            setIsFetching(false)
+
+    const init = async () => {
+        setIsFetching(true);
+        const res = await callFetchResumeByUser();
+        if (res && res.data) {
+            setListCV(res.data.result as IResume[])
         }
+        setIsFetching(false);
+    }
+
+
+    useEffect(() => {
         init();
     }, [])
 
@@ -34,7 +38,7 @@ const UserResume = (props: any) => {
             key: "index",
             width: 50,
             align: "center",
-            render: (index, record) => {
+            render: (text, record, index) => {
                 return (
                     <>
                         {(index + 1)}
@@ -78,19 +82,24 @@ const UserResume = (props: any) => {
 
     return (
         <div>
-            Bao dep trai
+            <Table
+                columns={columns}    // có để liên kết với datasourse
+                dataSource={listCV}
+                loading={isFetching}
+                pagination={false}
+            />
         </div>
     )
 }
 
 const ManageAccount = (props: IProps) => {
 
-    // const { open, onClose } = props;
+    const { open, onClose } = props;
 
     const items: TabsProps['items'] = [
         {
             key: 'user-resume',
-            label: `Rải CV`,
+            label: `Thông tin CV đã gửi`,
             children: <UserResume />,
         },
 
@@ -107,9 +116,28 @@ const ManageAccount = (props: IProps) => {
     ];
 
     return (
-        <div>manage.account</div>
+        <>
+            <Modal
+                title="Quản lý tài khoản"
+                open={open}  // true thì mở
+                onCancel={() => onClose(false)}
+                maskClosable={false}  // nhấn ra ngoài thì khôg mất
+                footer={null}
+                destroyOnClose={true}
+                width={isMobile ? "100%" : "1000px"}
+
+            >
+
+                <div style={{ minHeight: 400 }}>
+                    <Tabs
+                        defaultActiveKey="user-resume"  // active đầu tiền
+                        items={items}
+                    // onChange={onChange}
+                    />
+                </div>
+            </Modal>
+        </>
     )
-    
 }
 
 export default ManageAccount 

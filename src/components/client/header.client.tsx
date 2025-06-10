@@ -59,7 +59,8 @@ const Header = (props: any) => {
         if (res && res && +res.statusCode === 200) {
             dispatch(setLogoutAction({}));
             message.success('Đăng xuất thành công');
-            navivate('/')
+            // navivate('/')   // điều hướng không load lại trangAdd commentMore actions
+            window.location.reload();
         }
     }
 
