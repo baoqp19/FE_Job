@@ -29,8 +29,6 @@ const ClientCompanyDetailPage = (props: any) => {
       }
       init();
    }, [id])
-
-
    return (
       <div className={`${styles["container"]} ${styles["detail-job-section"]}`}>
          {isLoading
@@ -51,7 +49,6 @@ const ClientCompanyDetailPage = (props: any) => {
                         <Divider />
                         {parse(companyDetail?.description ?? "")}
                      </Col>
-
                      <Col span={24} md={8}>
                         <div className={styles["company"]}>
                            <div>

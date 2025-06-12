@@ -14,6 +14,11 @@ import ClientJobPage from "./page/job";
 import ClientJobDetailPage from "./page/job/detail";
 import ClientCompanyPage from "./page/company";
 import ClientCompanyDetailPage from "./page/company/detail";
+import LayoutAdmin from "./components/admin/layout.admin";
+import ProtectedRoute from "./components/share/protected-route";
+import DashboardPage from "./page/admin/dashboard";
+import CompanyPage from "./page/admin/company";
+import UserPage from "./page/admin/user";
 
 
 
@@ -70,6 +75,37 @@ export default function App() {
         { path: "company", element: <ClientCompanyPage /> },
         { path: "company/:id", element: <ClientCompanyDetailPage /> },
 
+      ]
+    },
+
+    {
+      path: "/admin",
+      element: (<LayoutApp> <LayoutAdmin /></LayoutApp>),
+      errorElement: <NotFound />,
+      children: [
+        {
+          index: true, element:
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+        },
+        {
+          path: "company",
+          element:
+            <ProtectedRoute>
+              <CompanyPage />
+            </ProtectedRoute>
+        },
+        {
+          path: "user",
+          element:
+            <ProtectedRoute>
+              <UserPage />
+            </ProtectedRoute>
+        },
+        {
+
+        }
       ]
     },
 
