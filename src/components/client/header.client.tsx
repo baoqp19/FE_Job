@@ -113,6 +113,7 @@ const Header = (props: any) => {
                                         selectedKeys={[current]} // chọn item nào thì có active
                                         mode='horizontal'  // cho các item nằm ngang
                                         items={items}
+                                        className={styles['menu-item']}   // button-uset
                                     />
                                 </ConfigProvider>
 

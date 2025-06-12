@@ -75,7 +75,7 @@ const CompanyCard = (props: IProps) => {
             <Col span={24}>
               <div className={isMobile ? styles["dflex-mobile"] : styles["dflex-pc"]}>
                 <span className={styles["title"]}>Nhà tuyển dụng hàng đầu</span>
-                {!showPagination && <Link to="company">Xem tất cả</Link>}
+                {!showPagination && <Link to="/company">Xem tất cả</Link>}
               </div>
             </Col>
             {
