@@ -12,7 +12,7 @@ const NotFound = () => {
                 extra={<Button type="primary"
                     onClick={() => navigate('/')}
                 >Back Home</Button>}
-            />
+            />  
         </>
     )
 }

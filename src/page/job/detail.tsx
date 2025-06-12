@@ -52,7 +52,7 @@ const ClientJobDetailPage = () => {
                     onClick={() => setIsModalOpen(true)}
                     className={styles["btn-apply"]}
                   >
-                    Applay Now
+                    Apply Now
                   </button>
                 </div>
                 <Divider />

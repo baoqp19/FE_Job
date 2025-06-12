@@ -39,7 +39,6 @@ const CompanyCard = (props: IProps) => {
     }
 
     const res = await callFetchCompany(query);
-    console.log(res)
     if (res && res.data) {
       setDisplayCompany(res.data.result);
       setTotal(res.data.meta.total)
