@@ -1,45 +1,50 @@
-import Access from '@/components/share/access';
+import ModalCompany from "@/components/admin/company/modal.company";
+import DataTable from "@/components/client/data-table";
+import Access from "@/components/share/access";
 import { callDeleteCompany } from '@/config/api';
-import { ALL_PERMISSIONS } from '@/config/permisstion';
+import { ALL_PERMISSIONS } from "@/config/permisstion";
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { fetchCompany } from "@/redux/slice/companySlide";
 import type { ICompany } from '@/types/backend';
-import { DeleteRowOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { Button, message, Popconfirm, Space } from 'antd';
+import { Button, message, notification, Popconfirm, Space } from 'antd';
 import dayjs from 'dayjs';
-import { useRef, useState } from 'react'
-import { sfLike } from 'spring-filter-query-builder';
 import queryString from 'query-string';
-import { fetchCompany } from '@/redux/slice/companySlide';
-import DataTable from '@/components/client/data-table';
-import ModalCompany from '@/components/admin/company/modal.company';
-
+import React, { useRef, useState } from 'react'
+import { sfLike } from "spring-filter-query-builder";
 
 const CompanyPage = () => {
+
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<ICompany | null>(null);
 
-
     const tableRef = useRef<ActionType>(null);
+
     const isFetching = useAppSelector(state => state.company.isFetching);
     const meta = useAppSelector(state => state.company.meta);
     const companies = useAppSelector(state => state.company.result);
 
     const dispatch = useAppDispatch();
 
-    // không gây ra re-render khi giá trị tham chiếu thay đổi.
-    const reloadTable = () => {
-        tableRef?.current?.reload();
-    }
-
     const handleDeleteCompany = async (id: string | undefined) => {
         if (id) {
             const res = await callDeleteCompany(id);
             if (res && +res.statusCode === 200) {
-                message.success("Xoá company thành công");
+                message.success('Xóa Company thành công');
                 reloadTable();
+            } else {
+                notification.error({
+                    message: 'Có lỗi xảy ra',
+                    description: res.message,
+                });
             }
         }
+    }
+
+    // không gây ra re-render khi giá trị tham chiếu thay đổi.
+    const reloadTable = () => {
+        tableRef?.current?.reload();
     }
 
     const columns: ProColumns<ICompany>[] = [
@@ -85,9 +90,10 @@ const CompanyPage = () => {
             title: 'Actions',
             hideInSearch: true,
             width: 50,
+            // entity, record giống nhau, entity: dữ liệu ở datasourse 
             render: (_value, entity, _index, _action) => (
                 <Space>
-                    <Access
+                    < Access
                         permission={ALL_PERMISSIONS.COMPANIES.UPDATE}
                         hideChildren
                     >
@@ -100,6 +106,7 @@ const CompanyPage = () => {
                             onClick={() => {
                                 setOpenModal(true);
                                 setDataInit(entity);
+                                console.log(entity)
                             }}
                         />
                     </Access >
@@ -116,7 +123,7 @@ const CompanyPage = () => {
                             cancelText="Hủy"
                         >
                             <span style={{ cursor: "pointer", margin: "0 10px" }}>
-                                <DeleteRowOutlined
+                                <DeleteOutlined
                                     style={{
                                         fontSize: 20,
                                         color: '#ff4d4f',
@@ -171,7 +178,6 @@ const CompanyPage = () => {
 
         return temp;
     }
-
 
     return (
         <div>

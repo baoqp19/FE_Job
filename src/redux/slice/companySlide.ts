@@ -30,6 +30,7 @@ export const fetchCompany = createAsyncThunk(
     'company/fetchCompany',
     async ({ query }: { query: string }) => {
         const response = await callFetchCompany(query)
+        console.log(response.data)
         return response;
     }
 )
