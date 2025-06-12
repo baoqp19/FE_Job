@@ -88,7 +88,6 @@ const Header = (props: any) => {
 
     return (
         <>
-
             <div className={styles['header-section']}>
                 <div className={styles.container}>
                     {!isMobile ?
