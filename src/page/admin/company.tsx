@@ -9,13 +9,13 @@ import type { ICompany } from '@/types/backend';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { Button, message, notification, Popconfirm, Space } from 'antd';
+import { table } from 'console';
 import dayjs from 'dayjs';
 import queryString from 'query-string';
 import React, { useRef, useState } from 'react'
 import { sfLike } from "spring-filter-query-builder";
 
 const CompanyPage = () => {
-
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataInit, setDataInit] = useState<ICompany | null>(null);
 
@@ -36,7 +36,7 @@ const CompanyPage = () => {
             } else {
                 notification.error({
                     message: 'Có lỗi xảy ra',
-                    description: res.message,
+                    description: res.message
                 });
             }
         }
@@ -106,7 +106,6 @@ const CompanyPage = () => {
                             onClick={() => {
                                 setOpenModal(true);
                                 setDataInit(entity);
-                                console.log(entity)
                             }}
                         />
                     </Access >
