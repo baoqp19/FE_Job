@@ -1,36 +1,36 @@
-import ModalCompany from "@/components/admin/company/modal.company";
+import ModalRole from "@/components/admin/role/modal.role";
 import DataTable from "@/components/client/data-table";
 import Access from "@/components/share/access";
-import { callDeleteCompany } from '@/config/api';
+import { callDeleteRole } from "@/config/api";
 import { ALL_PERMISSIONS } from "@/config/permisstion";
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { fetchCompany } from "@/redux/slice/companySlide";
-import type { ICompany } from '@/types/backend';
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { Button, message, notification, Popconfirm, Space } from 'antd';
-import dayjs from 'dayjs';
-import queryString from 'query-string';
-import React, { useRef, useState } from 'react'
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { fetchRole, fetchRoleById } from "@/redux/slice/roleSlice";
+import type { IRole } from "@/types/backend";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import type { ActionType, ProColumns } from "@ant-design/pro-components";
+import { Button, message, notification, Popconfirm, Space, Tag } from "antd";
+import dayjs from "dayjs";
+import queryString from "query-string";
+import { useRef, useState } from "react";
 import { sfLike } from "spring-filter-query-builder";
 
-const CompanyPage = () => {
+
+const RolePage = () => {
     const [openModal, setOpenModal] = useState<boolean>(false);
-    const [dataInit, setDataInit] = useState<ICompany | null>(null);
 
     const tableRef = useRef<ActionType>(null);
 
-    const isFetching = useAppSelector(state => state.company.isFetching);
-    const meta = useAppSelector(state => state.company.meta);
-    const companies = useAppSelector(state => state.company.result);
-
+    const isFetching = useAppSelector(state => state.role.isFetching);
+    const meta = useAppSelector(state => state.role.meta);
+    const roles = useAppSelector(state => state.role.result);
     const dispatch = useAppDispatch();
 
-    const handleDeleteCompany = async (id: string | undefined) => {
+
+    const handleDeleteRole = async (id: string | undefined) => {
         if (id) {
-            const res = await callDeleteCompany(id);
-            if (res && +res.statusCode === 200) {
-                message.success('Xóa Company thành công');
+            const res = await callDeleteRole(id);
+            if (res && res.statusCode === 200) {
+                message.success('Xóa Role thành công');
                 reloadTable();
             } else {
                 notification.error({
@@ -41,24 +41,19 @@ const CompanyPage = () => {
         }
     }
 
-    // không gây ra re-render khi giá trị tham chiếu thay đổi.
-    const reloadTable = () => {
-        tableRef?.current?.reload();
-    }
 
-    const columns: ProColumns<ICompany>[] = [
+    const columns: ProColumns<IRole>[] = [
         {
-            title: "STT",
-            key: 'index',
-            width: 50,
-            align: "center",
-            render: (text, record, index) => {
+            title: 'Id',
+            dataIndex: 'id',
+            width: 250,
+            render: (text, record, index, action) => {
                 return (
-                    <>
-                        {(index + 1) + (meta.page - 1) * (meta.pageSize)}
-                    </>)
+                    <span>
+                        {record.id}
+                    </span>
+                )
             },
-            // không có trong tìm kiếm 
             hideInSearch: true,
         },
         {
@@ -67,11 +62,17 @@ const CompanyPage = () => {
             sorter: true,
         },
         {
-            title: 'Address',
-            dataIndex: 'address',
-            sorter: true,
+            title: 'Trạng thái',
+            dataIndex: 'active',
+            render(dom, entity, index, action, schema) {
+                return <>
+                    <Tag color={entity.active ? "lime" : "red"} >
+                        {entity.active ? "ACTIVE" : "INACTIVE"}
+                    </Tag>
+                </>
+            },
+            hideInSearch: true,
         },
-
         {
             title: 'CreatedAt',
             dataIndex: 'createdAt',
@@ -85,15 +86,26 @@ const CompanyPage = () => {
             hideInSearch: true,
         },
         {
+            title: 'UpdatedAt',
+            dataIndex: 'updatedAt',
+            width: 200,
+            sorter: true,
+            render: (text, record, index, action) => {
+                return (
+                    <>{record.updatedAt ? dayjs(record.updatedAt).format('DD-MM-YYYY HH:mm:ss') : ""}</>
+                )
+            },
+            hideInSearch: true,
+        },
+        {
 
             title: 'Actions',
             hideInSearch: true,
             width: 50,
-            // entity, record giống nhau, entity: dữ liệu ở datasourse 
             render: (_value, entity, _index, _action) => (
                 <Space>
-                    < Access
-                        permission={ALL_PERMISSIONS.COMPANIES.UPDATE}
+                    <Access
+                        permission={ALL_PERMISSIONS.ROLES.UPDATE}
                         hideChildren
                     >
                         <EditOutlined
@@ -103,20 +115,20 @@ const CompanyPage = () => {
                             }}
                             type=""
                             onClick={() => {
+                                dispatch(fetchRoleById((entity.id) as string))
                                 setOpenModal(true);
-                                setDataInit(entity);
                             }}
                         />
-                    </Access >
+                    </Access>
                     <Access
-                        permission={ALL_PERMISSIONS.COMPANIES.DELETE}
+                        permission={ALL_PERMISSIONS.ROLES.DELETE}
                         hideChildren
                     >
                         <Popconfirm
                             placement="leftTop"
-                            title={"Xác nhận xóa company"}
-                            description={"Bạn có chắc chắn muốn xóa company này ?"}
-                            onConfirm={() => handleDeleteCompany(entity.id)}
+                            title={"Xác nhận xóa role"}
+                            description={"Bạn có chắc chắn muốn xóa role này ?"}
+                            onConfirm={() => handleDeleteRole(entity.id)}
                             okText="Xác nhận"
                             cancelText="Hủy"
                         >
@@ -130,10 +142,12 @@ const CompanyPage = () => {
                             </span>
                         </Popconfirm>
                     </Access>
-                </Space >
+                </Space>
             ),
+
         },
-    ]
+    ];
+
 
     const buildQuery = (params: any, sort: any, filter: any) => {
         const clone = { ...params };
@@ -142,12 +156,8 @@ const CompanyPage = () => {
             size: params.pageSize,
             filter: ""
         }
+
         if (clone.name) q.filter = `${sfLike("name", clone.name)}`;
-        if (clone.address) {
-            q.filter = clone.name ?
-                q.filter + " and " + `${sfLike("address", clone.address)}`
-                : `${sfLike("address", clone.address)}`;
-        }
 
         if (!q.filter) delete q.filter;
 
@@ -156,9 +166,6 @@ const CompanyPage = () => {
         let sortBy = "";
         if (sort && sort.name) {
             sortBy = sort.name === 'ascend' ? "sort=name,asc" : "sort=name,desc";
-        }
-        if (sort && sort.address) {
-            sortBy = sort.address === 'ascend' ? "sort=address,asc" : "sort=address,desc";
         }
         if (sort && sort.createdAt) {
             sortBy = sort.createdAt === 'ascend' ? "sort=createdAt,asc" : "sort=createdAt,desc";
@@ -177,23 +184,26 @@ const CompanyPage = () => {
         return temp;
     }
 
+    const reloadTable = () => {
+        tableRef?.current?.reload();
+    }
+
+
     return (
         <div>
             <Access
-                permission={ALL_PERMISSIONS.COMPANIES.GET_PAGINATE}
+                permission={ALL_PERMISSIONS.ROLES.GET_PAGINATE}
             >
-                <DataTable<ICompany>
+                <DataTable<IRole>
                     actionRef={tableRef}
-                    headerTitle="Danh sách Công Ty"
+                    headerTitle="Danh sách Roles (Vai Trò)"
                     rowKey="id"
                     loading={isFetching}
-                    // cột nào có hideInSearch: true thì không hiện trên nớ
                     columns={columns}
-                    dataSource={companies}
-                    // gửi yêu cầu lên server
+                    dataSource={roles}
                     request={async (params, sort, filter): Promise<any> => {
                         const query = buildQuery(params, sort, filter);
-                        dispatch(fetchCompany({ query }))
+                        dispatch(fetchRole({ query }))
                     }}
                     scroll={{ x: true }}
                     pagination={
@@ -205,35 +215,26 @@ const CompanyPage = () => {
                             showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} rows</div>) }
                         }
                     }
-                    // Cấu hình cho việc chọn hàng trong bảng.
                     rowSelection={false}
                     toolBarRender={(_action, _rows): any => {
                         return (
-                            <Access
-                                permission={ALL_PERMISSIONS.COMPANIES.CREATE}
-                                hideChildren
+                            <Button
+                                icon={<PlusOutlined />}
+                                type="primary"
+                                onClick={() => setOpenModal(true)}
                             >
-                                <Button
-                                    icon={<PlusOutlined />}
-                                    type="primary"
-                                    onClick={() => setOpenModal(true)}
-                                >
-                                    Thêm mới
-                                </Button>
-                            </Access>
+                                Thêm mới
+                            </Button>
                         );
                     }}
                 />
             </Access>
-            <ModalCompany
+            <ModalRole
                 openModal={openModal}
                 setOpenModal={setOpenModal}
                 reloadTable={reloadTable}
-                dataInit={dataInit}
-                setDataInit={setDataInit}
             />
         </div>
     )
 }
-
-export default CompanyPage
+export default RolePage
